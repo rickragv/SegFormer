@@ -11,12 +11,19 @@ ENV CMAKE_PREFIX_PATH="$(dirname $(which conda))/../"
 RUN apt-get update && apt-get install -y git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
-
+RUN apt-get update
+RUN apt-get install ffmpeg libsm6 libxext6  -y
 # Install mmsegmentation
 RUN conda clean --all
 
 RUN pip install mmcv-full==latest+torch1.6.0+cu101 -f https://download.openmmlab.com/mmcv/dist/index.html
-RUN git clone https://github.com/open-mmlab/mmsegmenation.git /mmsegmentation
+RUN git clone https://github.com/NVlabs/SegFormer.git /segformer
+RUN git clone https://github.com/open-mmlab/mmsegmentation.git /mmsegmentation
 WORKDIR /mmsegmentation
-RUN pip install -r requirements/build.txt
+RUN pip install -e .
+RUN pip install -r requirements.txt
+RUN pip install timm==0.3.2
 RUN pip install --no-cache-dir -e .
+RUN pip install jupyterlab
+ENTRYPOINT ["tail"]
+CMD ["-f","/dev/null"]
